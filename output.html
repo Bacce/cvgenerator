@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Render output</title>
+  </head>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .a4 {
+      width: 21cm;
+      min-height: 29.7cm;
+      border: 1px solid black;
+    }
+
+    @media print {
+      .a4 {
+        border: none;
+      }
+    }
+  </style>
+  <body>
+    <div class="a4" id="preview"></div>
+
+    <script>
+      const handleDataUpdate = () => {
+        const formData = localStorage.getItem("myFormData");
+        document.getElementById("preview").innerHTML = formData;
+      };
+
+      const init = () => {
+        // Load data
+        handleDataUpdate();
+
+        // Listen for future updates
+        window.addEventListener("storage", handleDataUpdate);
+      };
+
+      (() => {
+        init();
+      })();
+    </script>
+  </body>
+</html>

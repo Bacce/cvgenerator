@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #preview {
+        transform: scale(0.6);
+        transform-origin: top right;
+        width: 21cm;
+        min-height: 29.7cm;
+        border: 1px solid;
+        position: absolute;
+        right: 0;
+        top: 0;
+        background-color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <form onsubmit="handleOnSubmit(event)">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Name" /><br />
+      <label for="dob">Day of birth</label>
+      <input type="text" id="dob" placeholder="Day of Birth" /><br />
+      <label for="phone">Phone</label>
+      <input type="text" id="phone" placeholder="Phone" /><br />
+
+      <p>Experiences</p>
+      <div>
+        <div id="experienceContainer" style="border: 1px solid">
+          <!-- EXPERIENCE TEMPLATE COME HERE -->
+        </div>
+        <button onclick="handleAddField(event)">Add experience</button>
+      </div>
+      <hr />
+      <input type="submit" value="Save" />
+    </form>
+
+    <template id="experienceTemplate">
+      <div
+        class="experience"
+        style="
+          padding: 5px;
+          border: 1px solid;
+          background: lightgoldenrodyellow;
+        "
+      >
+        <label>Value1: </label><input class="val1" type="text" /><br />
+        <label>Value2: </label><input class="val2" type="text" />
+      </div>
+    </template>
+
+    <!-- PREVIEW -->
+    <button onclick="handlePrint()">Print</button>
+    <iframe
+      src="./output.html"
+      frameborder="0"
+      id="preview"
+      scrolling="no"
+    ></iframe>
+    <script>
+      let exCount = 0;
+
+      const handleAddField = (e, loadData) => {
+        e && e.preventDefault();
+        exCount = exCount + 1;
+        const template = document.getElementById("experienceTemplate");
+        const clone = template.content.cloneNode(true);
+        if (loadData) {
+          clone.children[0].getElementsByClassName("val1")[0].value =
+            loadData.val1;
+          clone.children[0].getElementsByClassName("val2")[0].value =
+            loadData.val2;
+        }
+        const container = document.getElementById("experienceContainer");
+        container.appendChild(clone);
+      };
+
+      const handlePrint = () => {
+        document.getElementById("preview").contentWindow.print();
+      };
+
+      const handleOnSubmit = (e) => {
+        e.preventDefault();
+        const data = getFormData();
+        localStorage.setItem("myFormData", JSON.stringify(data));
+      };
+
+      const getFormData = () => {
+        // Static inputs
+        const name = document.getElementById("name").value;
+        const dob = document.getElementById("dob").value;
+        const phone = document.getElementById("phone").value;
+
+        // Dynamic inputs
+        let experiences = [];
+        const expRaw = document.querySelectorAll(".experience");
+        expRaw.forEach((item, index) => {
+          const val1 = item.getElementsByClassName("val1")[0].value;
+          const val2 = item.getElementsByClassName("val2")[0].value;
+          experiences.push({ val1, val2 });
+        });
+
+        return {
+          name,
+          dob,
+          phone,
+          experiences,
+        };
+      };
+
+      const loadData = () => {
+        const data = localStorage.getItem("myFormData");
+        if (data) {
+          const parsedData = JSON.parse(data);
+          document.getElementById("name").value = parsedData.name;
+          document.getElementById("dob").value = parsedData.dob;
+          document.getElementById("phone").value = parsedData.phone;
+
+          parsedData.experiences.forEach((data) => {
+            handleAddField(null, data);
+          });
+        }
+      };
+
+      // Initialize
+      (() => {
+        loadData();
+      })();
+    </script>
+  </body>
+</html>
